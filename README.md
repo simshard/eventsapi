@@ -82,7 +82,8 @@ install api routes     *php artisan install:api*
             $table->integer('venue_capacity');  
             $table->dateTime('start_time');  
             $table->dateTime('end_time')->nullable();  
-           // $table->ownerId('user_id');    //foreign key  
+            $table->unsignedBigInteger('owner_id');
+            $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade'); 
             $table->timestamps();  
             });  
 
