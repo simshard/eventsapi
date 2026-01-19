@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use App\Models\Event;
 
 class User extends Authenticatable
@@ -68,6 +69,40 @@ class User extends Authenticatable
     public function events()
     {
       return $this->hasMany(Event::class, 'user_id');
+    }
+
+    /**
+     * Bookings made by this user
+     */
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class, 'user_id');
+    }
+
+    /**
+     * Events this user has booked (through bookings)
+     */
+    public function bookedEvents(): HasManyThrough
+    {
+        return $this->hasManyThrough(Event::class, Booking::class, 'user_id', 'id', 'id', 'event_id');
+    }
+
+    /**
+     * Check if user has already booked an event
+     */
+    public function hasBookedEvent($eventId): bool
+    {
+        return $this->bookings()
+            ->where('event_id', $eventId)
+            ->exists();
+    }
+
+    /**
+     * Scope: Get users who booked a specific event
+     */
+    public function scopeWhoBookedEvent($query, $eventId)
+    {
+        return $query->whereHas('bookings', fn ($q) => $q->where('event_id', $eventId));
     }
 
 }
