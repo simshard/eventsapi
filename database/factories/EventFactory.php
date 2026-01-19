@@ -21,14 +21,15 @@ class EventFactory extends Factory
         return [
             'title' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(),
-            'event_type' => $this->faker->word(),
+            'owner_id' => $this->faker->numberBetween(1, 10),
             'location' => $this->faker->city(),
             'venue_name' => $this->faker->word(),
-            'fee' => $this->faker->randomFloat(2, 0, 1000),
+            'fee' => $this->faker->randomFloat(2, 0, 50),
             'currency' => 'GBP',
-            'venue_capacity' => $this->faker->numberBetween(1, 1000),
-            'start_time' => $this->faker->dateTimeBetween(now(), now()->addMonth()),
+            'venue_capacity' => $this->faker->numberBetween(1, 20),
+             'start_time' => $this->faker->dateTimeBetween(now(), now()->addMonth()),
             'end_time' => $this->faker->dateTimeBetween(now(), now()->addMonth()),
+
         ];
     }
 }

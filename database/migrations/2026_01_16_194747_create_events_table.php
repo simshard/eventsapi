@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('event_type')->nullable();
+            $table->unsignedBigInteger('owner_id');
+            $table->foreign ('owner_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('location')->nullable();
             $table->string('venue_name')->nullable();
             $table->decimal('fee')->nullable();
@@ -23,8 +24,6 @@ return new class extends Migration
             $table->integer('venue_capacity');
             $table->dateTime('start_time');
             $table->dateTime('end_time')->nullable();
-            $table->unsignedBigInteger('owner_id');
-            $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

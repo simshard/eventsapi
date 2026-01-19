@@ -106,8 +106,53 @@ Resource class   controller policy classes
 - user cannot book a fully subscribed event
 
 
-Tinker  
+# Tinker  
 syntax for creating model instances in Tinker
-$event =\App\Models\Event::factory()->create()
-$event->save()
+ $event = \App\Models\Event::factory()->make() temp
+ $event = \App\Models\Event::factory()->create() persists  OR $event->save()
+   
+$user=User::factory()->create() 
+User::factory()->has(\App\Models\Event::factory()->count(2))->make()
+
+override vals??
+$user= new App\Models\User( ['name' => 'tester','email'=>'tester@ytest.com', 'password' => bcrypt('password')])
+$event = new App\Models\Event(['title'=>'test event','owner_id'=>$user->id])
+
+## TDD
+
+test('authenticated users can visit the dashboard and see a list of all events and a list of events that they are an owner of', function () {
+    $user = User::factory()->create();
+    
+    // Create events owned by the user
+    $ownedEvents = Event::factory(3)->create(['user_id' => $user->id]);
+    
+    // Create events owned by other users
+    $otherEvents = Event::factory(2)->create();
+    
+    $this->actingAs($user);
+    
+    $response = $this->get('/dashboard');
+    
+    $response->assertOk();
+    
+    // Assert all events are visible
+    foreach ($ownedEvents->merge($otherEvents) as $event) {
+        $response->assertSee($event->name);
+    }
+    
+    // Assert owned events are marked/identified as owned by the user
+    foreach ($ownedEvents as $event) {
+        $response->assertSeeText($event->name); // You may want a more specific assertion here
+    }
+});
+
+
+This test:
+
+- Creates a user
+- Creates 3 events owned by that user
+- Creates 2 events owned by other users
+- Verifies the dashboard shows all events
+- Verifies the owned events are visible
+- You may want to refine the "owned events" assertion based on how your dashboard markup identifies them (e.g., an "Edit" button, "owner" badge, etc.).
 

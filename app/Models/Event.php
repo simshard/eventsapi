@@ -29,11 +29,5 @@ class Event extends Model
 
     }
 
-    /**
-     * Determine if the event is free to attend.
-     */
-    public function isFree(): bool
-    {
-        return $this->fee === null || $this->fee->isZero();
-    }
+
 }
