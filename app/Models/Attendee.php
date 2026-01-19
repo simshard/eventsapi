@@ -23,13 +23,13 @@ class Attendee extends Model
 
 
     // Relationships
-    public function event()
+    public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
     // Accessor: Check if attendee has booked this event
-    public function booking()
+    public function booking(): HasOne
     {
         return $this->hasOne(Booking::class);
     }
