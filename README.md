@@ -5,13 +5,12 @@ while ensuring proper database design, request validation, and coding standards.
 
 ## Managing Events
 - Users should be able to create, update, delete, and list events.
-Managing Attendees
+# Managing Attendees
 - Users should be able to register attendees and manage their information.
-Booking System
+# Booking System
 - Users should be able to book an event.
 - The system should prevent overbooking and duplicate bookings.
-Authentication & Authorization (Implementation not required, only mention how it would be
-structured)
+# Authentication & Authorization (Implementation not required, only mention how it would be structured)
 - Assume that API consumers must be authenticated to manage events.
 - Attendees should be able to register without authentication.
 
@@ -49,6 +48,21 @@ This task is designed to assess:
 - Implementation of validation and error handling.
 - Use of design patterns and best practices.
 - Testing approach (expecting meaningful test coverage).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -124,7 +138,7 @@ test('authenticated users can visit the dashboard and see a list of all events a
     $user = User::factory()->create();
     
     // Create events owned by the user
-    $ownedEvents = Event::factory(3)->create(['user_id' => $user->id]);
+    $ownedEvents = Event::factory(3)->create(['owner_id' => $user->id]);
     
     // Create events owned by other users
     $otherEvents = Event::factory(2)->create();
@@ -140,19 +154,47 @@ test('authenticated users can visit the dashboard and see a list of all events a
         $response->assertSee($event->name);
     }
     
-    // Assert owned events are marked/identified as owned by the user
+    <!-- // Assert owned events are marked/identified as owned by the user
     foreach ($ownedEvents as $event) {
-        $response->assertSeeText($event->name); // You may want a more specific assertion here
-    }
+        $response->assertSeeText($event->title); // You may want a more specific assertion here
+    } -->
 });
 
 
-This test:
+ Repository Pattern + Service Layer
 
-- Creates a user
-- Creates 3 events owned by that user
-- Creates 2 events owned by other users
-- Verifies the dashboard shows all events
-- Verifies the owned events are visible
-- You may want to refine the "owned events" assertion based on how your dashboard markup identifies them (e.g., an "Edit" button, "owner" badge, etc.).
+ app/
+├── Models/
+│   ├── Event.php
+│   ├── User.php
+│   ├── Booking.php
+│   └── Attendee.php
+├── Http/
+│   ├── Controllers/
+│   │   ├── EventController.php
+│   │   ├── BookingController.php
+│   │   └── AttendeeController.php
+│   └── Requests/
+│       ├── StoreEventRequest.php
+│       ├── StoreBookingRequest.php
+│       └── StoreAttendeeRequest.php
+├── Services/
+│   ├── EventService.php
+│   ├── BookingService.php
+│   └── AttendeeService.php
+├── Repositories/
+│   ├── EventRepository.php
+│   ├── BookingRepository.php
+│   └── AttendeeRepository.php
+└── Policies/
+    ├── EventPolicy.php
+    └── BookingPolicy.php
+
+Layer	Responsibility
+Controller	Handle HTTP requests/responses, routing
+Service	Business logic (bookings, capacity checks, duplicate prevention)
+Repository	Database queries and data persistence
+Policy	Authorization (who can edit/delete)
+Request	Input validation
+
 

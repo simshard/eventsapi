@@ -27,7 +27,9 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request)
     {
-        $event = Event::create($request->all());
+        $data = $request->validated();
+        $data['user_id'] = auth()->id();
+        $event = Event::create($data);
         return response()->json($event, 201);
     }
 
@@ -36,14 +38,11 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        //$event = Event::find($event);
-        if(!$event){
-            return response()->json(['message' => 'Event not found'], 404);
-        }
+        // return view('event', [
+        //     'event' => $event
+        //  ]);
 
-        return view('event', [
-            'event' => $event
-         ]);
+         return response()->json($event);
 
     }
 
@@ -52,9 +51,9 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, Event $event)
     {
-        //$event = Event::find($event);
-        $event->update($request->all());
-        return response()->json($event,200);
+         $this->authorize('update', $event);
+        $event->update($request->validated());
+        return response()->json($event, 200);
     }
 
     /**
@@ -62,8 +61,9 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        $event = Event::destroy($event);
-        return response()->json(null,204);
+     $this->authorize('delete', $event);
+        $event->delete();
+        return response()->json(null, 204);
     }
 
 
@@ -83,4 +83,34 @@ class EventController extends Controller
     {
         //
     }
+
+
+/*
+✅ Pagination & filtering for list endpoints
+✅ Date validation logic
+✅ Capacity checking before operations
+✅ Prevents deletion of events with bookings
+✅ Availability calculation
+✅ Centralized business rules
+
+*/
+// public function store(StoreEventRequest $request)
+// {
+//     $event = $this->eventService->createEvent(auth()->id(), $request->validated());
+//     return response()->json($event, 201);
+// }
+
+// public function index()
+// {
+//     $allEvents = $this->eventService->getAllEvents();
+//     $myEvents = $this->eventService->getUserEvents(auth()->id());
+
+//     return response()->json([
+//         'all_events' => $allEvents,
+//         'my_events' => $myEvents,
+//     ]);
+// }
+
+
+
 }
