@@ -22,10 +22,10 @@ test('authenticated users can visit the dashboard and see a list of all events '
     $user2 = User::factory()->create();
 
     // Create events owned by the user
-     $ownedEvents = \App\Models\Event::factory(3)->create(['owner_id' => $user->id]);
+     $ownedEvents = \App\Models\Event::factory(3)->create(['user_id' => $user->id]);
 
     // Create events owned by other users
-    $otherEvents = \App\Models\Event::factory(2)->create(['owner_id' => $user2->id]);
+    $otherEvents = \App\Models\Event::factory(2)->create(['user_id' => $user2->id]);
 
     $this->actingAs($user);
 

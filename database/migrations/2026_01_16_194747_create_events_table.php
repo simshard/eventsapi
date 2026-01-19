@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->unsignedBigInteger('owner_id');
-            $table->foreign ('owner_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign ('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('location')->nullable();
             $table->string('venue_name')->nullable();
             $table->decimal('fee')->nullable();

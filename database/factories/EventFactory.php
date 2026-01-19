@@ -21,7 +21,7 @@ class EventFactory extends Factory
         return [
             'title' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(),
-            'owner_id' => $this->faker->numberBetween(1, 10),
+            'user_id' => $this->faker->numberBetween(1, 10),
             'location' => $this->faker->city(),
             'venue_name' => $this->faker->word(),
             'fee' => $this->faker->randomFloat(2, 0, 50),

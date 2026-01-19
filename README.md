@@ -96,8 +96,8 @@ install api routes     *php artisan install:api*
             $table->integer('venue_capacity');  
             $table->dateTime('start_time');  
             $table->dateTime('end_time')->nullable();  
-            $table->unsignedBigInteger('owner_id');
-            $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade'); 
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); 
             $table->timestamps();  
             });  
 
@@ -130,7 +130,7 @@ User::factory()->has(\App\Models\Event::factory()->count(2))->make()
 
 override vals??
 $user= new App\Models\User( ['name' => 'tester','email'=>'tester@ytest.com', 'password' => bcrypt('password')])
-$event = new App\Models\Event(['title'=>'test event','owner_id'=>$user->id])
+$event = new App\Models\Event(['title'=>'test event','user_id'=>$user->id])
 
 ## TDD
 
@@ -138,7 +138,7 @@ test('authenticated users can visit the dashboard and see a list of all events a
     $user = User::factory()->create();
     
     // Create events owned by the user
-    $ownedEvents = Event::factory(3)->create(['owner_id' => $user->id]);
+    $ownedEvents = Event::factory(3)->create(['user_id' => $user->id]);
     
     // Create events owned by other users
     $otherEvents = Event::factory(2)->create();
@@ -197,4 +197,7 @@ Repository	Database queries and data persistence
 Policy	Authorization (who can edit/delete)
 Request	Input validation
 
-
+✅ bookings table has unique constraint on user_id + event_id (prevents double booking at DB level)
+✅ attendees table has unique constraint on event_id + email (prevents duplicate attendee emails)
+✅ Foreign keys cascade delete when event/user deleted
+✅ venue_capacity in events for capacity checking
