@@ -10,7 +10,8 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware('auth')->get('/dashboard', [EventController::class, 'index'])->name('dashboard');
-Route::get('/events/{event}', [EventController::class, 'show']);
-Route::post('/events', [EventController::class, 'store']);
-Route::put('/events/{event}', [EventController::class, 'update']);
-Route::delete('/events/{event}', [EventController::class, 'destroy']);
+
+// Livewire CRUD routes
+Route::middleware('auth')->group(function () {
+    Route::livewire('/events', \App\Livewire\Events\EventsList::class)->name('events.index');
+});
