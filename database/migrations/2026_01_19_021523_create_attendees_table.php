@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('attendees', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->string('name');
+
             $table->string('email');
             $table->string('phone')->nullable();
             $table->unique(['event_id', 'email']); // Prevent duplicate registrations

@@ -14,4 +14,6 @@ Route::middleware('auth')->get('/dashboard', [EventController::class, 'index'])-
 // Livewire CRUD routes
 Route::middleware('auth')->group(function () {
     Route::livewire('/events', \App\Livewire\Events\EventsList::class)->name('events.index');
+    Route::livewire('/bookings', \App\Livewire\Bookings\MyBookings::class)->name('bookings.index');
+    Route::livewire('/events/{eventId}/attendees', \App\Livewire\Events\EventAttendees::class)->name('events.attendees');
 });

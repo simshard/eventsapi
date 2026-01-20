@@ -14,12 +14,9 @@ class Attendee extends Model
         'name',
         'email',
         'phone',
-        'registration_date',
     ];
 
-    protected $casts = [
-        'registration_date' => 'datetime',
-    ];
+    protected $casts = [];
 
 
     // Relationships

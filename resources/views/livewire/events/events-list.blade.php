@@ -51,8 +51,14 @@
                                     >
                                         Delete
                                     </button>
+                                    <a
+                                        href="{{ route('events.attendees', $event->id) }}"
+                                        class="text-purple-600 hover:text-purple-800"
+                                    >
+                                        Attendees
+                                    </a>
                                 @else
-                                    <span class="text-gray-500">—</span>
+                                    <livewire:events.book-event :eventId="$event->id" />
                                 @endif
                             </td>
                         </tr>
