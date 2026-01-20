@@ -27,13 +27,6 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request)
     {
-    //   //  $this->authorize('create', Event::class);
-    //     $data = $request->validated();
-    //     // dd($data); // Debug: see what validated data contains
-    //     $data['user_id'] = auth()->id();
-    //     $event = Event::create($data);
-    //     return response()->json($event, 201);
-
     $data = $request->validated();
     $data['user_id'] = auth()->id();
     $event = Event::create($data);
