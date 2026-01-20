@@ -17,7 +17,7 @@ test('authenticated users can visit the dashboard', function () {
 });
 
 
-test('authenticated users can visit the dashboard and see a list of all events ', function () {
+test('auth users can see a list of their owned events and other events', function () {
     $user = User::factory()->create();
     $user2 = User::factory()->create();
 
@@ -32,14 +32,17 @@ test('authenticated users can visit the dashboard and see a list of all events '
     $response = $this->get('/dashboard');
 
     $response->assertOk();
-
     // Assert all events are visible
     foreach ($ownedEvents->merge($otherEvents) as $event) {
         $response->assertSee($event->name);
     }
 
-    // Assert owned events are marked/identified as owned by the user
-    // foreach ($ownedEvents as $event) {
-    //     $response->assertSeeText($event->name); // You may want a more specific assertion here
-    // }
+    foreach ($ownedEvents as $event) {
+        $response->assertSeeText($user->name);
+    }
+
+   foreach ($otherEvents as $event) {
+     expect($event->owner->name)->toBe($user2->name);
+        $this->assertTrue($event->owner->name === $user2->name);
+    }
 });

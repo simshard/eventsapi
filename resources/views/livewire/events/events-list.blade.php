@@ -20,10 +20,12 @@
             <table class="min-w-full border-collapse border border-gray-300">
                 <thead class="bg-blue-400">
                     <tr >
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">ID</th>
                         <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Title</th>
                         <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Location</th>
                         <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Start Time</th>
                         <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Capacity</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Attendees</th>
                         <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Owner</th>
                         <th class="border border-gray-300 px-4 py-2 text-center text-gray-700"">Actions</th>
                     </tr>
@@ -31,10 +33,14 @@
                 <tbody>
                     @foreach ($events as $event)
                         <tr class="hover:bg-blue-500  hover:text-gray-100 transition-colors">
+                            <td class="border border-gray-300 px-4 py-2">
+                               {{ $event->id }}
+                            </td>
                             <td class="border border-gray-300 px-4 py-2">{{ $event->title }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $event->location ?? 'N/A' }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $event->start_time->format('M d, Y H:i') }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $event->venue_capacity }}</td>
+                            <td class="border border-gray-300 px-4 py-2">{{ $event->attendees()->count() }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $event->owner->name }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                                 @if (auth()->id() === $event->user_id)
@@ -78,7 +84,7 @@
     @if ($showCreateModal)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
-                <h2 class="text-2xl font-bold mb-4">Create Event</h2>
+                <h2 class="text-2xl font-bold mb-4 text-black">Create Event</h2>
                 <livewire:events.create-event />
                 <button
                     wire:click="closeModals"
@@ -93,7 +99,7 @@
     <!-- Edit Modal -->
     @if ($showEditModal && $editingEventId)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl text-black">
                 <h2 class="text-2xl font-bold mb-4">Edit Event</h2>
                 <livewire:events.edit-event :eventId="$editingEventId" />
                 <button

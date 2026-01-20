@@ -13,7 +13,7 @@ class BookingService
 
     public function bookEvent(int $userId, int $eventId): Booking
     {
-        $event = Event::findOrFail($eventId);
+         $event = Event::findOrFail($eventId);
 
         // Check capacity
         if ($event->bookings()->count() >= $event->venue_capacity) {

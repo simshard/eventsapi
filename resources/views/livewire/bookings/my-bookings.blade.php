@@ -14,7 +14,7 @@
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse border border-gray-300">
                 <thead class="bg-gray-100">
-                    <tr>
+                    <tr class="text-gray-700">
                         <th class="border border-gray-300 px-4 py-2 text-left">Event</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Attendee Name</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Email</th>
@@ -25,7 +25,7 @@
                 </thead>
                 <tbody>
                     @foreach ($bookings as $booking)
-                        <tr class="hover:bg-blue-100 hover:bg-opacity-50 transition-colors">
+                        <tr class="hover:bg-blue-200  hover:text-gray-500 transition-colors">
                             <td class="border border-gray-300 px-4 py-2">{{ $booking->event->title }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $booking->user->name }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $booking->user->email }}</td>

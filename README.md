@@ -201,3 +201,30 @@ Request	Input validation
 ✅ attendees table has unique constraint on event_id + email (prevents duplicate attendee emails)
 ✅ Foreign keys cascade delete when event/user deleted
 ✅ venue_capacity in events for capacity checking
+
+# Feature tests 
+User can view events list on dashboard
+User can create a new event
+User can edit their own event
+User can delete their own event
+User can view event details page
+User can filter events by "My Events Only"
+User can view attendees for an event
+User can book/register for an event
+User cannot edit another user's event
+User cannot delete another user's event
+Pagination works on events list
+Event creation shows success message
+# Unit Tests:
+
+Event model has correct relationships
+Event belongs to a user
+Event has many attendees
+User has many events
+Event validation rules work correctly
+Event start_time must be before end_time
+Event title is required
+Event location is optional
+Livewire EventsList component loads events
+Livewire EventDetails component loads correct event
+Event attendee count is accurate

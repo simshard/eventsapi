@@ -7,20 +7,43 @@
         <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+
                 <flux:sidebar.collapse class="lg:hidden" />
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Platform')" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        {{ __('All Events') }}
                     </flux:sidebar.item>
-                </flux:sidebar.group>
+                    <flux:sidebar.item icon="calendar" :href="route('bookings.index')" :current="request()->routeIs('bookings.index')" wire:navigate>
+                        {{ __('My Bookings') }}
+                    </flux:sidebar.item>
+            </flux:sidebar.group>
+            </flux:sidebar.nav>
+            <flux:spacer />
+            <flux:sidebar.nav>
+
+                    <flux:sidebar.item icon="arrow-right-start-on-rectangle" :href="route('profile.edit')" wire:navigate>
+                        {{ __('Settings') }}
+                    </flux:sidebar.item>
+                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                        @csrf
+                        <flux:sidebar.item
+                            as="button"
+                            type="submit"
+                            icon="arrow-left-end-on-rectangle"
+                            class="w-full cursor-pointer"
+                        >
+                            {{ __('Log Out') }}
+                        </flux:sidebar.item>
+                    </form>
+
             </flux:sidebar.nav>
 
             <flux:spacer />
 
-            <flux:sidebar.nav>
+            {{-- <flux:sidebar.nav>
                 <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
                     {{ __('Repository') }}
                 </flux:sidebar.item>
@@ -28,7 +51,7 @@
                 <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
                     {{ __('Documentation') }}
                 </flux:sidebar.item>
-            </flux:sidebar.nav>
+            </flux:sidebar.nav> --}}
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>

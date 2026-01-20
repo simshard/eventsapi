@@ -32,7 +32,10 @@ class Booking extends Model
         return $this->belongsTo(Event::class);
     }
 
- 
+    public function attendee(): BelongsTo
+    {
+        return $this->belongsTo(Attendee::class);
+    }
 
     // Scope: Get active/pending bookings
     public function scopeActive($query)
