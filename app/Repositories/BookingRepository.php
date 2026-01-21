@@ -59,6 +59,14 @@ class BookingRepository
     }
 
     /**
+     * Count bookings for a user
+     */
+     public function countByUser(int $userId): int
+     {
+         return Booking::where('user_id', $userId)->count();
+     }
+
+    /**
      * Count bookings for an event
      */
     public function countByEvent(int $eventId): int
@@ -89,7 +97,7 @@ class BookingRepository
     /**
      * Get bookings for event paginated
      */
-    public function getByEventPaginated(int $eventId, int $perPage = 15)
+    public function getByEventPaginated(int $eventId, int $perPage = 15): Paginator
     {
         return Booking::where('event_id', $eventId)
             ->with('user')
@@ -99,7 +107,7 @@ class BookingRepository
     /**
      * Get user's bookings paginated
      */
-    public function getByUserPaginated(int $userId, int $perPage = 15)
+    public function getByUserPaginated(int $userId, int $perPage = 15): Paginator
     {
         return Booking::where('user_id', $userId)
             ->with('event')
@@ -109,8 +117,12 @@ class BookingRepository
     /**
      * Get bookings with filters
      */
-    public function getFiltered(int $eventId, ?string $sortBy = 'created_at', int $perPage = 15)
+    public function getFiltered(int $eventId, ?string $sortBy = 'created_at', int $perPage = 15): Paginator
     {
+        $allowedColumns = ['created_at', 'updated_at', 'id', 'user_id']; // Define allowed columns for sorting
+        $sortBy = in_array($sortBy, $allowedColumns) ? $sortBy : 'created_at'; // Check if sortBy is in whitelist and Fallback to default if invalid
+        // Step 3: Use sanitized value for sorting to prevent SQL injection  or XSS attacks
+
         return Booking::where('event_id', $eventId)
             ->with('user')
             ->orderBy($sortBy, 'desc')
@@ -119,32 +131,18 @@ class BookingRepository
 }
 
 /*
-Key Features:
+ 
+ CRUD operations
+ Query by event and user
+ Duplicate booking detection
+ Pagination support
+ Eager loading relationships
+ Filtering and sorting
+ Input sanitization to prevent SQL injection
 
-✅ CRUD operations
-✅ Query by event and user
-✅ Duplicate booking detection
-✅ Pagination support
-✅ Eager loading relationships
-✅ Filtering and sorting
+Whitelist approach — only allow specific columns
+Default fallback — use safe default if invalid input
+Type hints — int $eventId prevents injection there
+Laravel Query Builder — parameterized queries for WHERE clauses
 
-Usage in BookingService:
-
-<?php
-public function bookEvent(int $userId, int $eventId): Booking
-{
-    if ($this->repository->userHasBooked($userId, $eventId)) {
-        throw new Exception('User already booked this event');
-    }
-
-    return $this->repository->create([
-        'user_id' => $userId,
-        'event_id' => $eventId,
-    ]);
-}
-
-public function cancelBooking(int $bookingId): void
-{
-    $this->repository->delete($bookingId);
-}
 */

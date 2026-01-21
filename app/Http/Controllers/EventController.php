@@ -2,118 +2,79 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Event;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
-use App\Models\Event;
+use App\Services\EventService;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class EventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private EventService $eventService) {}
+
+    public function index(Request $request): JsonResponse
     {
-         $allEvents = \App\Models\Event::all();
-         $myEvents = auth()->user()->events;
-         return view('dashboard', [
-             'allEvents' => $allEvents,
-             'myEvents' => $myEvents,
-         ]);
+        $perPage = $request->query('per_page', 15);
+        $search = $request->query('search');
+        $filter = $request->query('filter');
+        $userId = auth('sanctum')->id();
+
+        if ($filter === 'my-events' && $userId) {
+            $events = $this->eventService->getUserEvents($userId, $perPage);
+        } else {
+            $events = $this->eventService->getAllEvents($perPage, $search);
+        }
+
+        return response()->json([
+            'data' => $events->items(),
+            'meta' => [
+                'total' => $events->total(),
+                'per_page' => $events->perPage(),
+                'current_page' => $events->currentPage(),
+                'last_page' => $events->lastPage(),
+            ],
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreEventRequest $request)
+    public function store(StoreEventRequest $request): JsonResponse
     {
-    $data = $request->validated();
-    $data['user_id'] = auth()->id();
-    $event = Event::create($data);
+        $data = $request->validated();
+        $event = $this->eventService->createEvent(auth('sanctum')->id(), $data);
 
-    return response()->json([
-        'data' => $event,
-    ], 201);
+        return response()->json(['data' => $event], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Event $event)
+    public function show(Event $event): JsonResponse
     {
-        // return view('event', [
-        //     'event' => $event
-        //  ]);
-
-         return response()->json($event);
-
+        return response()->json(['data' => $event]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateEventRequest $request, Event $event)
+    public function update(UpdateEventRequest $request, Event $event): JsonResponse
     {
-         $this->authorize('update', $event);
-        $event->update($request->validated());
-        return response()->json($event, 200);
+        $userId = auth('sanctum')->id();
+        if (!$userId || $userId !== $event->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $data = $request->validated();
+        $updatedEvent = $this->eventService->updateEvent($event, $data);
+
+        return response()->json(['data' => $updatedEvent]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Event $event)
+    public function destroy(Event $event): JsonResponse
     {
-     $this->authorize('delete', $event);
-        $event->delete();
+        $userId = auth('sanctum')->id();
+        if (!$userId || $userId !== $event->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if ($event->bookings()->exists()) {
+            return response()->json(['message' => 'Cannot delete event with existing bookings'], 422);
+        }
+
+        $this->eventService->deleteEvent($event);
         return response()->json(null, 204);
     }
-
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Event $event)
-    {
-        //
-    }
-
-
-/*
-✅ Pagination & filtering for list endpoints
-✅ Date validation logic
-✅ Capacity checking before operations
-✅ Prevents deletion of events with bookings
-✅ Availability calculation
-✅ Centralized business rules
-
-*/
-// public function store(StoreEventRequest $request)
-// {
-//     $event = $this->eventService->createEvent(auth()->id(), $request->validated());
-//     return response()->json($event, 201);
-// }
-
-// public function index()
-// {
-//     $allEvents = $this->eventService->getAllEvents();
-//     $myEvents = $this->eventService->getUserEvents(auth()->id());
-
-//     return response()->json([
-//         'all_events' => $allEvents,
-//         'my_events' => $myEvents,
-//     ]);
-// }
-
-
-
 }

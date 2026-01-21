@@ -37,6 +37,11 @@ class EventPolicy
      */
     public function update(User $user, Event $event): bool
     {
+        \Log::info('EventPolicy update check', [
+        'user_id' => $user->id,
+        'event_user_id' => $event->user_id,
+        'match' => $user->id === $event->user_id,
+    ]);
         return $user->id === $event->user_id; // Only event owner can update
     }
 

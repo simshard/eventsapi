@@ -36,6 +36,11 @@ class Event extends Model
         'end_time' => 'datetime',
     ];
 
+        public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     /**
      * Get the owner of the event.
      */

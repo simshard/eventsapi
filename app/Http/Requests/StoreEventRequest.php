@@ -29,8 +29,16 @@ class StoreEventRequest extends FormRequest
         'fee' => 'nullable|numeric',
         'currency' => 'nullable|string',
         'venue_capacity' => 'required|integer|min:1',
-        'start_time' => 'required|date_format:Y-m-d H:i:s',
-        'end_time' => 'required|date_format:Y-m-d H:i:s',
+        'start_time' => 'required|date_format:Y-m-d H:i:s|after:now',
+        'end_time' => 'required|date_format:Y-m-d H:i:s|after:start_time',
     ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'end_time.after' => 'End time must be after start time',
+            'start_time.after' => 'Start time must be in the future',
+        ];
     }
 }
