@@ -10,7 +10,7 @@ class EventService implements EventServiceInterface
 {
     private EventRepository $eventRepository;
 
-    public function __construct(EventRepository $eventRepository)
+    public function __construct(EventRepositoryInterface $eventRepository)
     {
         $this->eventRepository = $eventRepository;
     }

@@ -1,16 +1,37 @@
+##SETUP##
+> Download or Clone this Repository
+> 
+> Once setup at a terminal run     composer run dev
+> 
+> set up database php artisan migrate -seed
+> 
+> App runs in browser at  [http://127.0.0.1:8000]
+>
 
-### Event Booking API 
+> Login to dashboard with 
+> 
+>              user  Tester
+>           'email' => tester@example.com
+>           'password' =>  password
+> 
+>           or create a new user
+
+
+    
+
+
+### Brief for Event Booking API 
  RESTful API for an Event Booking System that allows users to manage event bookings
 while ensuring proper database design, request validation, and coding standards.
 
 ## Managing Events
 - Users should be able to create, update, delete, and list events.
-# Managing Attendees
+## Managing Attendees
 - Users should be able to register attendees and manage their information.
-# Booking System
+## Booking System
 - Users should be able to book an event.
 - The system should prevent overbooking and duplicate bookings.
-# Authentication & Authorization (Implementation not required, only mention how it would be structured)
+## Authentication & Authorization (Implementation not required, only mention how it would be structured)
 - Assume that API consumers must be authenticated to manage events.
 - Attendees should be able to register without authentication.
 
@@ -35,11 +56,11 @@ while ensuring proper database design, request validation, and coding standards.
 - The completed solution must be stored in a public repository (e.g., GitHub, GitLab, or Bitbucket) or
 a private repository with an invitation provided to access it.
 
-#Bonus# (Optional Enhancements)
+## Bonus (Optional Enhancements)
 -  Pagination and filtering for listing events.
 -  API documentation (Swagger/Postman).
 -  Docker support for easy deployment.
--  
+  
 # Evaluation Criteria #
 This task is designed to assess:
 
@@ -49,90 +70,7 @@ This task is designed to assess:
 - Use of design patterns and best practices.
 - Testing approach (expecting meaningful test coverage).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Build NOTES #
-
-laravel new events api
-livewire starter kit to include  user auth scaffolding and  Blade templates and Flux UI components
-
- but no rect/vue/inertia   - mainly this  is annoying extra shit that I would rather not deal with
- testing with pest -make a readme
-
-install api routes     *php artisan install:api*  
- api test route     /api/demo
-
-### plan for course schema 
-
- Schema::create('events', function (Blueprint $table) {  
-            $table->id();  
-            $table->string('title');  
-            $table->text('description')->nullable();  
-            $table->string('event_type')->nullable();  
-            $table->string('location')->nullable();  
-            $table->string('venue_name')->nullable();  
-            $table->decimal('fee')->nullable();  
-            $table->string('currency')->nullable();  
-            $table->integer('venue_capacity');  
-            $table->dateTime('start_time');  
-            $table->dateTime('end_time')->nullable();  
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); 
-            $table->timestamps();  
-            });  
-
-**php artisan make:model Event -a**
-
-model,migration factory seeder   
-request classes for store and update 
-Resource class   controller policy classes
-
-##To do list for TDD##
-
-**logged in user**
-- can see dashboard  and 
--  All events  and  users own events lists
-
-- user can create ,  edit  , delete  an event
-- user can book an event 
-- there are a limited number of users can book  a specific event as venues have a max capacity
-- user cannot book same event more than once 
-- user cannot book a fully subscribed event
-
-
-# Tinker  
-syntax for creating model instances in Tinker
- $event = \App\Models\Event::factory()->make() temp
- $event = \App\Models\Event::factory()->create() persists  OR $event->save()
-   
-$user=User::factory()->create() 
-User::factory()->has(\App\Models\Event::factory()->count(2))->make()
-
-override vals??
-$user= new App\Models\User( ['name' => 'tester','email'=>'tester@ytest.com', 'password' => bcrypt('password')])
-$event = new App\Models\Event(['title'=>'test event','user_id'=>$user->id])
-
-## Architure
+## ############################################# ##
 
 ## Architecture
 
@@ -168,70 +106,74 @@ app/
 
 ## SOLID Principles Assessment
 
-**Strengths:**
+SOLID Principles Assessment - Updated Review
+Based on your current implementation with interfaces and repositories, here's the revised assessment:
 
-✅ **Single Responsibility Principle (SRP)**
-- Services handle business logic (booking validation, capacity checks)
-- Repositories handle data access only
-- Controllers delegate to services, don't contain logic
-- Policies handle authorization separately
+✅ Single Responsibility Principle (SRP)
 
-✅ **Open/Closed Principle (OCP)**
-- Repository pattern allows swapping implementations without changing controllers
-- Services can be extended without modification
+- Controllers - Handle HTTP requests only, delegate to services
+- Services - Encapsulate business logic (booking validation, capacity checks, duplicate prevention)
+- Repositories - Abstract database queries exclusively
+- Policies - Handle authorization separately
+- Requests - Validate incoming data only
+- Example: BookingService focuses solely on booking logic, EventAvailabilityService handles capacity checks independently.
 
-✅ **Liskov Substitution Principle (LSP)**
-- Repositories can be swapped (interface-based)
-- Services follow consistent contracts
+✅ Open/Closed Principle (OCP)
+- Strong Implementation:
+- Repository pattern allows swapping implementations without changing services/controllers
+- Services depend on repository interfaces, not concrete classes
+- New repository implementations can be created without modifying existing code
+- Example: Can create CachedEventRepository without touching EventService or controllers.
 
-✅ **Interface Segregation Principle (ISP)**
-- Separate request validation classes per action
-- Policies focused on specific authorization concerns
+✅ Liskov Substitution Principle (LSP)
+- Strong Implementation:
+- All EventRepository implementations honor the EventRepositoryInterface contract
+- All BookingRepository implementations can substitute each other
+- Services receive interfaces, not concrete types
+- Current Status: Excellent - no violations expected.
 
-✅ **Dependency Inversion Principle (DIP)**
-- Services inject repositories, not directly using models
-- Controllers depend on service contracts, not implementations
+✅ Interface Segregation Principle (ISP)
+- Good Implementation:
+- Separate interfaces for different concerns:
+- EventRepositoryInterface vs BookingRepositoryInterface vs AttendeeRepositoryInterface
+- EventServiceInterface vs BookingServiceInterface
 
-**Recommended Improvements:**
+- Consider splitting EventRepositoryInterface further:
+- EventQueryRepositoryInterface (read operations: paginate, getUpcoming, getPast)
+- EventCommandRepositoryInterface (write operations: create, update, delete)
+- This follows CQRS principles and prevents clients from depending on methods they don't use.
+
+✅ Dependency Inversion Principle (DIP)
+- Excellent Implementation:
+- Services depend on repository interfaces, not concrete classes
+- AppServiceProvider binds interfaces to implementations
+- Constructor injection in all services
+
+
+Principle	Status	Notes
+SRP	✅ Strong	Clear separation of concerns
+OCP	✅ Strong	Repository pattern enables extension
+LSP	✅ Strong	Interface contracts respected
+ISP	⚠️ Good	Consider splitting query/command operations (not Done)
+DIP	⚠️ Good	Fixed  constructors use interfaces rather than concrete classes
+
+**Improvements:**
 
 1. **Explicit Repository Interfaces**
-   ```php
    // Create interfaces for repositories
-   interface EventRepositoryInterface {
-       public function findById($id);
-       public function create(array $data);
-       public function update($id, array $data);
-   }
-   ```
    This enforces DIP and makes swapping implementations easier.
-
 2. **Service Contracts**
-   ```php
    // Define service interfaces
-   interface BookingServiceInterface {
-       public function book(User $user, Event $event): Booking;
-       public function validateBooking(User $user, Event $event): bool;
-   }
-   ```
-
+   interface BookingServiceInterface 
 3. **Dependency Injection Container**
    Bind interfaces to implementations in `AppServiceProvider`:
-   ```php
-   $this->app->bind(EventRepositoryInterface::class, EventRepository::class);
-   $this->app->bind(BookingServiceInterface::class, BookingService::class);
-   ```
-
 4. **Separate Query & Command Services**
    - Create separate services for read operations (queries) vs write operations (commands)
    - Improves testability and adheres to CQRS principles
-
 5. **Value Objects**
    - Consider creating value objects for booking validation rules, capacity checks
    - Makes business logic more reusable and testable
 
-**Current Architecture Grade: B+**
-
-Your code follows SOLID well. Adding explicit interfaces would elevate it to A and improve maintainability significantly.
  
 ######################################################################
 
@@ -256,18 +198,18 @@ Your code follows SOLID well. Adding explicit interfaces would elevate it to A a
 
 
 ## Unit Tests
-Event belongs to a User
-Event has many Bookings
-Event has many Attendees
-Event title is required
-Event start_time is required
-Event end_time is required
-Event venue_capacity is required and must be positive
-Event start_time must be before end_time
-Event can calculate available capacity (venue_capacity - confirmed bookings count)
-Event scope: upcoming events (start_time > now)
-Event scope: past events (start_time <= now)
-Event scope: by user (filter by creator)
-Event scope: available events (available capacity > 0)
-Event is fully booked when confirmed bookings equal venue_capacity
+- Event belongs to a User
+- Event has many Bookings
+- Event has many Attendees
+- Event title is required
+- Event start_time is required
+- Event end_time is required
+- Event venue_capacity is required and must be positive
+- Event start_time must be before end_time
+- Event can calculate available capacity (venue_capacity - confirmed bookings count)
+- Event scope: upcoming events (start_time > now)
+- Event scope: past events (start_time <= now)
+- Event scope: by user (filter by creator)
+- Event scope: available events (available capacity > 0)
+- Event is fully booked when confirmed bookings equal venue_capacity
 

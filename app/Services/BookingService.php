@@ -10,7 +10,7 @@ use Exception;
 
 class BookingService implements BookingServiceInterface
 {
-    public function __construct(private BookingRepository $repository) {}
+    public function __construct(private BookingRepositoryInterface $repository) {}
 
 
     /**
