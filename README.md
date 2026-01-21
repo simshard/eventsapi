@@ -233,40 +233,6 @@ app/
 
 Your code follows SOLID well. Adding explicit interfaces would elevate it to A and improve maintainability significantly.
  
-
-
-
-
-
-# Feature tests 
-User can view events list on dashboard
-User can create a new event
-User can edit their own event
-User can delete their own event
-User can view event details page
-User can filter events by "My Events Only"
-User can view attendees for an event
-User can book/register for an event
-User cannot edit another user's event
-User cannot delete another user's event
-Pagination works on events list
-Event creation shows success message
-# Unit Tests:
-
-Event model has correct relationships
-Event belongs to a user
-Event has many attendees
-User has many events
-Event validation rules work correctly
-Event start_time must be before end_time
-Event title is required
-Event location is optional
-Livewire EventsList component loads events
-Livewire EventDetails component loads correct event
-Event attendee count is accurate
-
-
-
 ######################################################################
 
 ### Booking Feature Tests
@@ -278,15 +244,7 @@ Event attendee count is accurate
 - User can cancel a booking
 
 
-
-
-
-
-
-
 ### Attendee Tests
-
-
 - Attendee name is required
 - User can view all attendees for their event
 - Event organizer can see booking details (who booked, when)
@@ -298,60 +256,18 @@ Event attendee count is accurate
 
 
 ## Unit Tests
+Event belongs to a User
+Event has many Bookings
+Event has many Attendees
+Event title is required
+Event start_time is required
+Event end_time is required
+Event venue_capacity is required and must be positive
+Event start_time must be before end_time
+Event can calculate available capacity (venue_capacity - confirmed bookings count)
+Event scope: upcoming events (start_time > now)
+Event scope: past events (start_time <= now)
+Event scope: by user (filter by creator)
+Event scope: available events (available capacity > 0)
+Event is fully booked when confirmed bookings equal venue_capacity
 
-### Booking Model Tests
-- Booking belongs to User
-- Booking belongs to Event
-- Booking belongs to Attendee
-- Booking has status field (confirmed/cancelled)
-- Booking has booking_date timestamp
-- Booking can be marked as cancelled
-- Booking scope: confirmed bookings only
-- Booking scope: cancelled bookings only
-- Booking scope: by event
-- Booking scope: by user
-
-### Attendee Model Tests
-- Attendee has many bookings
-- Attendee belongs to User
-- Attendee fields are correct (name, email, phone)
-- Attendee name is required
-- Attendee email validation works
-- Attendee phone is optional
-- Attendee can be soft deleted
-
-### Booking Service Tests
-- BookingService validates capacity before booking
-- BookingService prevents duplicate bookings
-- BookingService prevents user from booking own event
-- BookingService creates booking record correctly
-- BookingService creates attendee record correctly
-- BookingService calculates available spots correctly
-- BookingService checks event hasn't ended
-- BookingService throws exception for invalid bookings
-- BookingService cancels booking correctly
-- BookingService updates event attendee count
-
-### Repository Tests
-- EventRepository returns available spots correctly
-- EventRepository filters booked vs available events
-- BookingRepository retrieves user's bookings
-- BookingRepository retrieves event's bookings
-- AttendeeRepository finds by event
-- AttendeeRepository finds by user
-- BookingRepository soft deletes correctly
-
-### Policy Tests
-- User can view bookings they created
-- User cannot view other user's bookings
-- Event organizer can view all bookings for their event
-- User cannot cancel other user's bookings
-- Event organizer can cancel attendee bookings
-
-### Validation Tests
-- Attendee name is required
-- Attendee email format validation
-- Attendee phone format validation (optional)
-- Booking validates event exists
-- Booking validates user exists
-- Booking validates attendee exists

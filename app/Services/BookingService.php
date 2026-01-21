@@ -8,7 +8,7 @@ use App\Repositories\BookingRepository;
 use App\Services\EventAvailabilityService;
 use Exception;
 
-class BookingService
+class BookingService implements BookingServiceInterface
 {
     public function __construct(private BookingRepository $repository) {}
 

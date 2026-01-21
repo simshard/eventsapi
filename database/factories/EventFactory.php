@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Event;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EventFactory extends Factory
@@ -12,17 +13,19 @@ class EventFactory extends Factory
 
     public function definition(): array
     {
+        $startTime = Carbon::now()->addDays(rand(1, 30));
+        $endTime = $startTime->copy()->addHours(8);
         return [
             'user_id' => User::factory(),
-            'title' => $this->faker->sentence(),
-            'description' => $this->faker->paragraph(),
-            'location' => $this->faker->city(),
-            'venue_name' => $this->faker->word(),
-            'fee' => $this->faker->randomFloat(2, 0, 100),
+            'title' => 'Test Event ' . rand(1, 1000),
+            'description' => 'Event description',
+            'location' => 'Test Location',
+            'venue_name' => 'Test Venue',
+            'fee' => 50.00,
             'currency' => 'GBP',
-            'venue_capacity' => $this->faker->numberBetween(1, 100),
-            'start_time' => $this->faker->dateTimeBetween('+1 day', '+30 days'),
-            'end_time' => $this->faker->dateTimeBetween('+31 days', '+60 days'),
+            'venue_capacity' => rand(1, 100),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
         ];
     }
 }

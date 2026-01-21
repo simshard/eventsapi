@@ -6,7 +6,7 @@ use App\Models\Event;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class EventRepository
+class EventRepository implements EventRepositoryInterface
 {
     /**
      * Create a new event
@@ -145,29 +145,4 @@ class EventRepository
     }
 }
 
-/*
-Key Features
-CRUD Operations:
-
-create(), findById(), update(), delete()
- Query Methods:
-
-paginate() — all events with search & filtering
-getUserEvents() — user's events paginated
-getByUser() — user's events (no pagination)
-all() — all events
- Advanced Features:
-
-getFiltered() — with sorting & SQL injection protection
-countByUser() — count user's events
-exists() — check if event exists
-getUpcoming() — events starting in future
-getPast() — events already finished
-Eager Loading:
-
-.with('user', 'bookings') — loads relationships to prevent N+1 queries
-Security:
-
-Whitelist approach in getFiltered() for sorting
-
-*/
+ 

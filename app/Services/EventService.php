@@ -6,7 +6,7 @@ use App\Repositories\EventRepository;
 use App\Models\Event;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class EventService
+class EventService implements EventServiceInterface
 {
     private EventRepository $eventRepository;
 

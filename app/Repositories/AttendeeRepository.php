@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Attendee;
 
-class AttendeeRepository
+class AttendeeRepository implements AttendeeRepositoryInterface
 {
     /**
      * Create a new attendee

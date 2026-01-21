@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('currency')->nullable();
             $table->integer('venue_capacity');
             $table->dateTime('start_time');
-            $table->dateTime('end_time')->nullable();
+            $table->dateTime('end_time');
             $table->timestamps();
         });
     }

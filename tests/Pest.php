@@ -11,10 +11,10 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
+uses(TestCase::class, RefreshDatabase::class)->in('Feature', 'Unit');
 /*
 |--------------------------------------------------------------------------
 | Expectations

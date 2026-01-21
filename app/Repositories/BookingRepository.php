@@ -6,7 +6,7 @@ use App\Models\Booking;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
 
-class BookingRepository
+class BookingRepository implements BookingRepositoryInterface
 {
     /**
      * Create a new booking
@@ -130,19 +130,3 @@ class BookingRepository
     }
 }
 
-/*
- 
- CRUD operations
- Query by event and user
- Duplicate booking detection
- Pagination support
- Eager loading relationships
- Filtering and sorting
- Input sanitization to prevent SQL injection
-
-Whitelist approach — only allow specific columns
-Default fallback — use safe default if invalid input
-Type hints — int $eventId prevents injection there
-Laravel Query Builder — parameterized queries for WHERE clauses
-
-*/
