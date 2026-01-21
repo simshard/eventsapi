@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Attendee;
 use App\Models\Event;
+use App\Models\Booking;
 use App\Repositories\AttendeeRepository;
 use Exception;
 
@@ -11,78 +12,73 @@ class AttendeeService
 {
     public function __construct(private AttendeeRepository $repository) {}
 
-    /**
-     * Register an attendee for an event (no authentication required)
-     */
     public function registerAttendee(int $eventId, array $data): Attendee
     {
         $event = Event::findOrFail($eventId);
 
-        // Validate attendee doesn't already exist
-        $this->validateUniqueAttendee($eventId, $data['email']);
+        $confirmedCount = Booking::where('event_id', $eventId)
+            ->where('status', 'confirmed')
+            ->count();
 
-        // Check event capacity
-        $booked = $event->bookings()->count();
-        if ($booked >= $event->venue_capacity) {
-            throw new Exception('Event is fully booked');
+        if ($confirmedCount >= $event->venue_capacity) {
+            throw new Exception('Event is at full capacity');
         }
 
-        $data['event_id'] = $eventId;
-        return $this->repository->create($data);
+        $attendee = $this->repository->create(array_merge($data, ['event_id' => $eventId]));
+
+        Booking::create([
+            'event_id' => $eventId,
+            'attendee_id' => $attendee->id,
+            'user_id' => auth()->id() ?? null,
+            'status' => 'confirmed',
+        ]);
+
+        return $attendee;
     }
 
-    /**
-     * Get all attendees for an event
-     */
     public function getEventAttendees(int $eventId): array
     {
-        return $this->repository->getByEvent($eventId);
+        $attendees = Attendee::byEvent($eventId)->get();
+
+        return $attendees->map(function ($attendee) {
+            $booking = Booking::where('attendee_id', $attendee->id)->first();
+            return [
+                'id' => $attendee->id,
+                'name' => $attendee->name,
+                'email' => $attendee->email,
+                'phone' => $attendee->phone,
+                'booking_status' => $booking?->status ?? 'unconfirmed',
+                'booked_at' => $booking?->created_at->toIso8601String(),
+            ];
+        })->toArray();
     }
 
-    /**
-     * Update attendee information
-     */
-    public function updateAttendee(Attendee $attendee, array $data): Attendee
-    {
-        // If email is being changed, validate uniqueness
-        if (isset($data['email']) && $data['email'] !== $attendee->email) {
-            $this->validateUniqueAttendee($attendee->event_id, $data['email'], $attendee->id);
-        }
-
-        return $this->repository->update($attendee->id, $data);
-    }
-
-    /**
-     * Unregister an attendee
-     */
-    public function unregisterAttendee(Attendee $attendee): void
-    {
-        $this->repository->delete($attendee->id);
-    }
-
-    /**
-     * Get attendee count for an event
-     */
     public function getAttendeeCount(int $eventId): int
     {
-        return $this->repository->countByEvent($eventId);
+        return Booking::where('event_id', $eventId)
+            ->where('status', 'confirmed')
+            ->count();
     }
 
-    /**
-     * Check if email already registered for event
-     */
-    public function isEmailRegistered(int $eventId, string $email, ?int $excludeId = null): bool
+    public function updateAttendee(Attendee $attendee, array $data): Attendee
     {
-        return $this->repository->emailExists($eventId, $email, $excludeId);
-    }
-
-    /**
-     * Validate unique attendee email per event
-     */
-    private function validateUniqueAttendee(int $eventId, string $email, ?int $excludeId = null): void
-    {
-        if ($this->isEmailRegistered($eventId, $email, $excludeId)) {
-            throw new Exception('This email is already registered for this event');
+        if (isset($data['status']) && $data['status'] === 'cancelled') {
+            $booking = Booking::where('attendee_id', $attendee->id)->first();
+            if ($booking) {
+                $booking->update(['status' => 'cancelled']);
+            }
         }
+
+        $attendee->update($data);
+        return $attendee;
+    }
+
+    public function unregisterAttendee(Attendee $attendee): void
+    {
+        $booking = Booking::where('attendee_id', $attendee->id)->first();
+        if ($booking) {
+            $booking->update(['status' => 'cancelled']);
+        }
+        $attendee->delete();
     }
 }

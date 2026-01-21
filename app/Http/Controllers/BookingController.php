@@ -4,11 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Services\BookingService;
 use App\Http\Requests\StoreBookingRequest;
+use App\Models\Booking;
+use Illuminate\Http\Request;
 use Exception;
 
 class BookingController extends Controller
 {
     public function __construct(private BookingService $service) {}
+
+    public function index(Request $request)
+    {
+        $bookings = Booking::where('user_id', $request->user()->id)->get();
+        return response()->json(['data' => $bookings]);
+    }
 
     public function store(StoreBookingRequest $request)
     {
@@ -23,10 +31,9 @@ class BookingController extends Controller
         }
     }
 
-    public function destroy(int $bookingId)
+    public function destroy(Booking $booking)
     {
-        $this->authorize('delete', Booking::findOrFail($bookingId));
-        $this->service->cancelBooking($bookingId);
+        $booking->update(['status' => 'cancelled']);
         return response()->json(null, 204);
     }
 }

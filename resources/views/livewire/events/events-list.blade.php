@@ -20,14 +20,14 @@
             <table class="min-w-full border-collapse border border-gray-300">
                 <thead class="bg-blue-400">
                     <tr >
-                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">ID</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Title</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Location</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Start Time</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Capacity</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Attendees</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-700">Owner</th>
-                        <th class="border border-gray-300 px-4 py-2 text-center text-gray-700"">Actions</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-100">ID</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-100">Title</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-100">Location</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-100">Start Time</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-100">Capacity</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-100">Attendees</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-gray-100">Owner</th>
+                        <th class="border border-gray-300 px-4 py-2 text-center text-gray-100">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,15 +80,15 @@
         <p class="text-gray-500">No events found.</p>
     @endif
 
-    <!-- Create Modal -->
+        <!-- Create Modal -->
     @if ($showCreateModal)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
-                <h2 class="text-2xl font-bold mb-4 text-black">Create Event</h2>
+            <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 w-11/12 sm:w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-4 text-black dark:text-white">Create Event</h2>
                 <livewire:events.create-event />
                 <button
                     wire:click="closeModals"
-                    class="mt-4 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+                    class="mt-4 bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
                 >
                     Close
                 </button>
@@ -99,12 +99,12 @@
     <!-- Edit Modal -->
     @if ($showEditModal && $editingEventId)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl text-black">
-                <h2 class="text-2xl font-bold mb-4">Edit Event</h2>
+            <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 w-11/12 sm:w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-4 text-black dark:text-white">Edit Event</h2>
                 <livewire:events.edit-event :eventId="$editingEventId" />
                 <button
                     wire:click="closeModals"
-                    class="mt-4 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+                    class="mt-4 bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
                 >
                     Close
                 </button>

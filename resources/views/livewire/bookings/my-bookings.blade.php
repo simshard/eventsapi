@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center">
         <h1 class="text-3xl font-bold">My Bookings</h1>
         <div>
-            <select wire:model.live="filterStatus" class="border border-gray-300 rounded px-3 py-2 bg-gray-100 text-black">
+            <select wire:model.live="filterStatus" class="border border-gray-300 rounded px-3 py-2 bg-gray-100 text-white">
                 <option value="">All Bookings</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="cancelled">Cancelled</option>
@@ -14,7 +14,7 @@
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse border border-gray-300">
                 <thead class="bg-gray-100">
-                    <tr class="text-gray-700">
+                    <tr class="text-gray-100">
                         <th class="border border-gray-300 px-4 py-2 text-left">Event</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Attendee Name</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Email</th>

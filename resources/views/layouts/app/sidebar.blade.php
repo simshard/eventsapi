@@ -111,7 +111,9 @@
             </flux:dropdown>
         </flux:header>
 
-        {{ $slot }}
+
+            {{ $slot }}
+        
 
         @fluxScripts
     </body>

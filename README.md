@@ -132,75 +132,111 @@ override vals??
 $user= new App\Models\User( ['name' => 'tester','email'=>'tester@ytest.com', 'password' => bcrypt('password')])
 $event = new App\Models\Event(['title'=>'test event','user_id'=>$user->id])
 
-## TDD
+## Architure
 
-test('authenticated users can visit the dashboard and see a list of all events and a list of events that they are an owner of', function () {
-    $user = User::factory()->create();
-    
-    // Create events owned by the user
-    $ownedEvents = Event::factory(3)->create(['user_id' => $user->id]);
-    
-    // Create events owned by other users
-    $otherEvents = Event::factory(2)->create();
-    
-    $this->actingAs($user);
-    
-    $response = $this->get('/dashboard');
-    
-    $response->assertOk();
-    
-    // Assert all events are visible
-    foreach ($ownedEvents->merge($otherEvents) as $event) {
-        $response->assertSee($event->name);
-    }
-    
-    <!-- // Assert owned events are marked/identified as owned by the user
-    foreach ($ownedEvents as $event) {
-        $response->assertSeeText($event->title); // You may want a more specific assertion here
-    } -->
-});
+## Architecture
 
+This application follows a **layered architecture** using the **Repository Pattern** and **Service Layer**:
 
- Repository Pattern + Service Layer
+**Layer Responsibilities:**
 
- app/
-├── Models/
-│   ├── Event.php
-│   ├── User.php
-│   ├── Booking.php
-│   └── Attendee.php
+- **Controllers** - Handle HTTP requests/responses and routing
+- **Services** - Encapsulate business logic (booking validation, capacity checks, duplicate prevention)
+- **Repositories** - Abstract database queries and data persistence
+- **Policies** - Handle authorization (who can edit/delete resources)
+- **Requests** - Validate incoming data
+
+**Benefits:**
+
+- **Separation of Concerns** - Each layer has a single responsibility
+- **Testability** - Services and repositories can be unit tested independently
+- **Maintainability** - Business logic is centralized in services, not scattered in controllers
+- **Reusability** - Services can be called from multiple controllers or API endpoints
+
+**Directory Structure:**
+
+```
+app/
+├── Models/              # Eloquent models
 ├── Http/
-│   ├── Controllers/
-│   │   ├── EventController.php
-│   │   ├── BookingController.php
-│   │   └── AttendeeController.php
-│   └── Requests/
-│       ├── StoreEventRequest.php
-│       ├── StoreBookingRequest.php
-│       └── StoreAttendeeRequest.php
-├── Services/
-│   ├── EventService.php
-│   ├── BookingService.php
-│   └── AttendeeService.php
-├── Repositories/
-│   ├── EventRepository.php
-│   ├── BookingRepository.php
-│   └── AttendeeRepository.php
-└── Policies/
-    ├── EventPolicy.php
-    └── BookingPolicy.php
+│   ├── Controllers/     # Request handlers
+│   └── Requests/        # Form request validation
+├── Services/            # Business logic layer
+├── Repositories/        # Data access layer
+└── Policies/            # Authorization
+```
 
-Layer	Responsibility
-Controller	Handle HTTP requests/responses, routing
-Service	Business logic (bookings, capacity checks, duplicate prevention)
-Repository	Database queries and data persistence
-Policy	Authorization (who can edit/delete)
-Request	Input validation
+## SOLID Principles Assessment
 
-✅ bookings table has unique constraint on user_id + event_id (prevents double booking at DB level)
-✅ attendees table has unique constraint on event_id + email (prevents duplicate attendee emails)
-✅ Foreign keys cascade delete when event/user deleted
-✅ venue_capacity in events for capacity checking
+**Strengths:**
+
+✅ **Single Responsibility Principle (SRP)**
+- Services handle business logic (booking validation, capacity checks)
+- Repositories handle data access only
+- Controllers delegate to services, don't contain logic
+- Policies handle authorization separately
+
+✅ **Open/Closed Principle (OCP)**
+- Repository pattern allows swapping implementations without changing controllers
+- Services can be extended without modification
+
+✅ **Liskov Substitution Principle (LSP)**
+- Repositories can be swapped (interface-based)
+- Services follow consistent contracts
+
+✅ **Interface Segregation Principle (ISP)**
+- Separate request validation classes per action
+- Policies focused on specific authorization concerns
+
+✅ **Dependency Inversion Principle (DIP)**
+- Services inject repositories, not directly using models
+- Controllers depend on service contracts, not implementations
+
+**Recommended Improvements:**
+
+1. **Explicit Repository Interfaces**
+   ```php
+   // Create interfaces for repositories
+   interface EventRepositoryInterface {
+       public function findById($id);
+       public function create(array $data);
+       public function update($id, array $data);
+   }
+   ```
+   This enforces DIP and makes swapping implementations easier.
+
+2. **Service Contracts**
+   ```php
+   // Define service interfaces
+   interface BookingServiceInterface {
+       public function book(User $user, Event $event): Booking;
+       public function validateBooking(User $user, Event $event): bool;
+   }
+   ```
+
+3. **Dependency Injection Container**
+   Bind interfaces to implementations in `AppServiceProvider`:
+   ```php
+   $this->app->bind(EventRepositoryInterface::class, EventRepository::class);
+   $this->app->bind(BookingServiceInterface::class, BookingService::class);
+   ```
+
+4. **Separate Query & Command Services**
+   - Create separate services for read operations (queries) vs write operations (commands)
+   - Improves testability and adheres to CQRS principles
+
+5. **Value Objects**
+   - Consider creating value objects for booking validation rules, capacity checks
+   - Makes business logic more reusable and testable
+
+**Current Architecture Grade: B+**
+
+Your code follows SOLID well. Adding explicit interfaces would elevate it to A and improve maintainability significantly.
+ 
+
+
+
+
 
 # Feature tests 
 User can view events list on dashboard
@@ -228,3 +264,94 @@ Event location is optional
 Livewire EventsList component loads events
 Livewire EventDetails component loads correct event
 Event attendee count is accurate
+
+
+
+######################################################################
+
+### Booking Feature Tests
+- User can book an available event
+- User can view their bookings on dashboard
+- User cannot book a fully booked event
+- User cannot book the same event twice 
+- Booking is rejected if event capacity is reached
+- User can cancel a booking
+
+
+
+
+
+
+
+
+### Attendee Tests
+
+
+- Attendee name is required
+- User can view all attendees for their event
+- Event organizer can see booking details (who booked, when)
+- Attendee list shows booking status (confirmed/cancelled)
+- Attendee can be marked as cancelled
+- Event with capacity of 5 accepts only 5 bookings and a booking is rejected when capacity     reached
+- Cancelling a booking reduces attendee count
+
+
+
+## Unit Tests
+
+### Booking Model Tests
+- Booking belongs to User
+- Booking belongs to Event
+- Booking belongs to Attendee
+- Booking has status field (confirmed/cancelled)
+- Booking has booking_date timestamp
+- Booking can be marked as cancelled
+- Booking scope: confirmed bookings only
+- Booking scope: cancelled bookings only
+- Booking scope: by event
+- Booking scope: by user
+
+### Attendee Model Tests
+- Attendee has many bookings
+- Attendee belongs to User
+- Attendee fields are correct (name, email, phone)
+- Attendee name is required
+- Attendee email validation works
+- Attendee phone is optional
+- Attendee can be soft deleted
+
+### Booking Service Tests
+- BookingService validates capacity before booking
+- BookingService prevents duplicate bookings
+- BookingService prevents user from booking own event
+- BookingService creates booking record correctly
+- BookingService creates attendee record correctly
+- BookingService calculates available spots correctly
+- BookingService checks event hasn't ended
+- BookingService throws exception for invalid bookings
+- BookingService cancels booking correctly
+- BookingService updates event attendee count
+
+### Repository Tests
+- EventRepository returns available spots correctly
+- EventRepository filters booked vs available events
+- BookingRepository retrieves user's bookings
+- BookingRepository retrieves event's bookings
+- AttendeeRepository finds by event
+- AttendeeRepository finds by user
+- BookingRepository soft deletes correctly
+
+### Policy Tests
+- User can view bookings they created
+- User cannot view other user's bookings
+- Event organizer can view all bookings for their event
+- User cannot cancel other user's bookings
+- Event organizer can cancel attendee bookings
+
+### Validation Tests
+- Attendee name is required
+- Attendee email format validation
+- Attendee phone format validation (optional)
+- Booking validates event exists
+- Booking validates user exists
+- Booking validates attendee exists

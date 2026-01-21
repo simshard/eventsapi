@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Attendee extends Model
 {
@@ -16,16 +18,12 @@ class Attendee extends Model
         'phone',
     ];
 
-    protected $casts = [];
-
-
     // Relationships
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
-    // Accessor: Check if attendee has booked this event
     public function booking(): HasOne
     {
         return $this->hasOne(Booking::class);

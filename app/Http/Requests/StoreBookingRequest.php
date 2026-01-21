@@ -25,6 +25,9 @@ class StoreBookingRequest extends FormRequest
                 'integer',
                 'exists:events,id', // Event must exist
             ],
+            'attendee.name' => 'required|string|max:255',
+            'attendee.email' => 'nullable|email',
+            'attendee.phone' => 'nullable|string|max:20',
         ];
     }
 
@@ -37,6 +40,8 @@ class StoreBookingRequest extends FormRequest
             'event_id.required' => 'Event ID is required',
             'event_id.exists' => 'The selected event does not exist',
             'event_id.integer' => 'Event ID must be an integer',
+            'attendee.name.required' => 'Attendee name is required',
+            'attendee.email.email' => 'Attendee email must be a valid email address',
         ];
     }
 }
