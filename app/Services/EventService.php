@@ -1,14 +1,15 @@
 <?php
 
 namespace App\Services;
-
-use App\Repositories\EventRepository;
+use App\Repositories\EventRepositoryInterface;
 use App\Models\Event;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+
+
 class EventService implements EventServiceInterface
 {
-    private EventRepository $eventRepository;
+    private EventRepositoryInterface $eventRepository;
 
     public function __construct(EventRepositoryInterface $eventRepository)
     {

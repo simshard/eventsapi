@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
-use App\Services\EventService;
+use App\Services\EventServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class EventController extends Controller
 {
-    public function __construct(private EventService $eventService) {}
+    public function __construct(private EventServiceInterface $eventService) {}
 
     public function index(Request $request): JsonResponse
     {
