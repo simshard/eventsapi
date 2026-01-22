@@ -41,11 +41,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($bookings as $booking)
+                     @foreach ($bookings as $booking)
                         <tr class="hover:bg-blue-100 dark:hover:bg-gray-700 hover:bg-opacity-50 transition-colors">
-                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-black dark:text-white">{{ $booking->attendee->name }}</td>
-                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-black dark:text-white">{{ $booking->attendee->email }}</td>
-                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-black dark:text-white">{{ $booking->attendee->phone ?? 'N/A' }}</td>
+                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-black dark:text-white">{{ $booking->attendee?->name ?? 'N/A' }}</td>
+                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-black dark:text-white">{{ $booking->attendee?->email ?? 'N/A' }}</td>
+                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-black dark:text-white">{{ $booking->attendee?->phone ?? 'N/A' }}</td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-black dark:text-white">{{ $booking->user->name }}</td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-black dark:text-white">{{ $booking->booking_date->format('M d, Y') }}</td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">

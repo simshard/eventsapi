@@ -57,6 +57,11 @@ class Event extends Model
     /**
      * Get the user that owns the event
      */
+
+        public function owner(): BelongsTo
+    {
+        return $this->user();
+    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
