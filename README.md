@@ -118,7 +118,6 @@ app/
 - Example: BookingService focuses solely on booking logic, EventAvailabilityService handles capacity checks independently.
 
  Open/Closed Principle (OCP)
-- Strong Implementation:
 - Repository pattern allows swapping implementations without changing services/controllers
 - Services depend on repository interfaces, not concrete classes
 - New repository implementations can be created without modifying existing code
