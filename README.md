@@ -72,7 +72,7 @@ This task is designed to assess:
 - Use of design patterns and best practices.
 - Testing approach (expecting meaningful test coverage).
 
-## ############### NOTES ############################## ##
+## ############### Dev Notes ############################## ##
 
 ## Architecture
 
@@ -108,10 +108,7 @@ app/
 
 ## SOLID Principles Assessment
 
-SOLID Principles Assessment - Updated Review
-Based on your current implementation with interfaces and repositories, here's the revised assessment:
-
-✅ Single Responsibility Principle (SRP)
+ Single Responsibility Principle (SRP)
 
 - Controllers - Handle HTTP requests only, delegate to services
 - Services - Encapsulate business logic (booking validation, capacity checks, duplicate prevention)
@@ -120,64 +117,43 @@ Based on your current implementation with interfaces and repositories, here's th
 - Requests - Validate incoming data only
 - Example: BookingService focuses solely on booking logic, EventAvailabilityService handles capacity checks independently.
 
-✅ Open/Closed Principle (OCP)
+ Open/Closed Principle (OCP)
 - Strong Implementation:
 - Repository pattern allows swapping implementations without changing services/controllers
 - Services depend on repository interfaces, not concrete classes
 - New repository implementations can be created without modifying existing code
 - Example: Can create CachedEventRepository without touching EventService or controllers.
 
-✅ Liskov Substitution Principle (LSP)
-- Strong Implementation:
+ Liskov Substitution Principle (LSP)
 - All EventRepository implementations honor the EventRepositoryInterface contract
 - All BookingRepository implementations can substitute each other
 - Services receive interfaces, not concrete types
 - Current Status: Excellent - no violations expected.
 
-✅ Interface Segregation Principle (ISP)
-- Good Implementation:
+ Interface Segregation Principle (ISP)
 - Separate interfaces for different concerns:
 - EventRepositoryInterface vs BookingRepositoryInterface vs AttendeeRepositoryInterface
 - EventServiceInterface vs BookingServiceInterface
 
-- Consider splitting EventRepositoryInterface further:
-- EventQueryRepositoryInterface (read operations: paginate, getUpcoming, getPast)
-- EventCommandRepositoryInterface (write operations: create, update, delete)
-- This follows CQRS principles and prevents clients from depending on methods they don't use.
-
-✅ Dependency Inversion Principle (DIP)
-- Excellent Implementation:
+ Dependency Inversion Principle (DIP)
 - Services depend on repository interfaces, not concrete classes
 - AppServiceProvider binds interfaces to implementations
 - Constructor injection in all services
 
-
-Principle	Status	Notes
-SRP	✅ Strong	Clear separation of concerns
-OCP	✅ Strong	Repository pattern enables extension
-LSP	✅ Strong	Interface contracts respected
-ISP	⚠️ Good	Consider splitting query/command operations (not Done)
-DIP	⚠️ Good	Fixed  constructors use interfaces rather than concrete classes
-
-**Improvements:**
-
-1. **Explicit Repository Interfaces**
-   // Create interfaces for repositories
-   This enforces DIP and makes swapping implementations easier.
-2. **Service Contracts**
-   // Define service interfaces
-   interface BookingServiceInterface 
-3. **Dependency Injection Container**
-   Bind interfaces to implementations in `AppServiceProvider`:
-4. **Separate Query & Command Services**
-   - Create separate services for read operations (queries) vs write operations (commands)
-   - Improves testability and adheres to CQRS principles
-5. **Value Objects**
-   - Consider creating value objects for booking validation rules, capacity checks
-   - Makes business logic more reusable and testable
-
  
 ######################################################################
+
+  ## Event Feature Tests
+
+  - guests are redirected to the login page                             
+  - authenticated users can visit the dashboard                         
+  - auth users can see a list of their owned events and other events    
+  - authenticated user can update their own event                       
+  - user cannot update another user's event                             
+  - unauthenticated user cannot create an event                         
+  - event creation fails when data is missing required fields           
+  - event creation fails when start_time is after end_time              
+  - event is created with correct user_id                               
 
 ### Booking Feature Tests
 - User can book an available event
@@ -187,8 +163,7 @@ DIP	⚠️ Good	Fixed  constructors use interfaces rather than concrete classes
 - Booking is rejected if event capacity is reached
 - User can cancel a booking
 
-
-### Attendee Tests
+### Attendee  Tests
 - Attendee name is required
 - User can view all attendees for their event
 - Event organizer can see booking details (who booked, when)
@@ -196,8 +171,6 @@ DIP	⚠️ Good	Fixed  constructors use interfaces rather than concrete classes
 - Attendee can be marked as cancelled
 - Event with capacity of 5 accepts only 5 bookings and a booking is rejected when capacity     reached
 - Cancelling a booking reduces attendee count
-
-
 
 ## Unit Tests
 - Event belongs to a User
@@ -214,4 +187,3 @@ DIP	⚠️ Good	Fixed  constructors use interfaces rather than concrete classes
 - Event scope: by user (filter by creator)
 - Event scope: available events (available capacity > 0)
 - Event is fully booked when confirmed bookings equal venue_capacity
-
