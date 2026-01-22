@@ -1,24 +1,24 @@
-##SETUP##
-> Download or Clone this Repository
+## SETUP ##
+> ### Download or Clone this Repository
 > 
-> Once setup at a terminal run     composer run dev
+> #### at a terminal #### `run     composer run dev`
 > 
-> set up database php artisan migrate -seed
+> set up database `php artisan migrate -seed`
 > 
 > App runs in browser at  [http://127.0.0.1:8000]
 >
 
-> Login to dashboard with 
-> 
->              user  Tester
+ ### Login to dashboard with ###
+> ~~~
 >           'email' => tester@example.com
 >           'password' =>  password
 > 
->           or create a new user
+>           OR    create a new user
+> ~~~
+
 
 
     
-
 
 ### Brief for Event Booking API 
  RESTful API for an Event Booking System that allows users to manage event bookings
@@ -70,7 +70,7 @@ This task is designed to assess:
 - Use of design patterns and best practices.
 - Testing approach (expecting meaningful test coverage).
 
-## ############################################# ##
+## ############### NOTES ############################## ##
 
 ## Architecture
 

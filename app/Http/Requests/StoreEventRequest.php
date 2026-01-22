@@ -22,6 +22,7 @@ class StoreEventRequest extends FormRequest
         return auth('sanctum')->check();
     }
 
+
     /**
      * Get the validation rules that apply to the request
      *
@@ -112,8 +113,21 @@ class StoreEventRequest extends FormRequest
      *
      * @return array Validated and transformed event data
      */
+
     public function validated($key = null, $default = null)
-    {
-        return parent::validated($key, $default);
+{
+    $data = parent::validated($key, $default);
+
+    // Map capacity to venue_capacity
+    if (isset($data['capacity'])) {
+        $data['venue_capacity'] = $data['capacity'];
+        unset($data['capacity']);
     }
+
+    return $data;
+}
+
+
+
+
 }
