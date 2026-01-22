@@ -2,115 +2,152 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Services\EventServiceInterface;
+use App\Http\Resources\EventResource;
+use App\Http\Resources\EventCollectionResource;
+use App\Http\Responses\ApiResponse;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
-use App\Services\EventServiceInterface;
-use Illuminate\Http\Request;
+use App\Models\Event;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 /**
  * EventController
  *
- * Handles HTTP requests for event management
+ * Handles event API endpoints with proper response serialization
  */
 class EventController extends Controller
 {
-    public function __construct(private EventServiceInterface $eventService) {}
+    use AuthorizesRequests;
+    private EventServiceInterface $eventService;
+
+    public function __construct(EventServiceInterface $eventService)
+    {
+        $this->eventService = $eventService;
+    }
 
     /**
-     * Get all events or user's events with pagination and filtering
+     * Get all events (paginated)
      *
-     * @param Request $request HTTP request with query parameters
-     * @return JsonResponse JSON response with events and pagination metadata
+     * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $perPage = $request->query('per_page', 15);
-        $search = $request->query('search');
-        $filter = $request->query('filter');
-        $userId = auth('sanctum')->id();
+        try {
+            $events = $this->eventService->getAllEvents();
 
-        if ($filter === 'my-events' && $userId) {
-            $events = $this->eventService->getUserEvents($userId, $perPage);
-        } else {
-            $events = $this->eventService->getAllEvents($perPage, $search);
+            return ApiResponse::success(
+                new EventCollectionResource($events),
+                'Events retrieved successfully'
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
 
-        return response()->json([
-            'data' => $events->items(),
-            'meta' => [
-                'total' => $events->total(),
-                'per_page' => $events->perPage(),
-                'current_page' => $events->currentPage(),
-                'last_page' => $events->lastPage(),
-            ],
-        ]);
+    /**
+     * Get a single event by ID
+     *
+     * @param Event $event
+     * @return JsonResponse
+     */
+    public function show(Event $event): JsonResponse
+    {
+        try {
+            return ApiResponse::success(
+                new EventResource($event),
+                'Event retrieved successfully'
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Create a new event
      *
-     * @param StoreEventRequest $request Validated event creation request
-     * @return JsonResponse JSON response with created event (201 Created)
+     * @param StoreEventRequest $request
+     * @return JsonResponse
      */
     public function store(StoreEventRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $event = $this->eventService->createEvent(auth('sanctum')->id(), $data);
+        try {
+            $event = $this->eventService->createEvent(
+                auth()->id(),
+                $request->validated()
+            );
 
-        return response()->json(['data' => $event], 201);
+            return ApiResponse::success(
+                new EventResource($event),
+                'Event created successfully',
+                Response::HTTP_CREATED
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Retrieve a single event by ID
-     *
-     * @param Event $event The event instance (injected via route model binding)
-     * @return JsonResponse JSON response with event
-     */
-    public function show(Event $event): JsonResponse
-    {
-        return response()->json(['data' => $event]);
-    }
-
-    /**
-     * Update an existing event (owner only)
-     *
-     * @param UpdateEventRequest $request Validated event update request
-     * @param Event $event The event instance (injected via route model binding)
-     * @return JsonResponse JSON response with updated event or 403 Forbidden
-     */
-    public function update(UpdateEventRequest $request, Event $event): JsonResponse
-    {
-        $userId = auth('sanctum')->id();
-        if (!$userId || $userId !== $event->user_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+   /**
+ * Update an event
+ *
+ * @param Event $event
+ * @param UpdateEventRequest $request
+ * @return JsonResponse
+ */
+public function update(Event $event, UpdateEventRequest $request): JsonResponse
+{
+    try {
+        // Check authorization first
+        if ($this->authorize('update', $event) === false) {
+            return ApiResponse::error(
+                'You are not authorized to update this event',
+                Response::HTTP_FORBIDDEN
+            );
         }
 
-        $data = $request->validated();
-        $updatedEvent = $this->eventService->updateEvent($event, $data);
+        $event = $this->eventService->updateEvent($event, $request->validated());
 
-        return response()->json(['data' => $updatedEvent]);
+        return ApiResponse::success(
+            new EventResource($event),
+            'Event updated successfully'
+        );
+    } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+        \Log::warning('Authorization denied for event update', [
+            'user_id' => auth()->id(),
+            'event_id' => $event->id,
+        ]);
+        return ApiResponse::error(
+            'You are not authorized to update this event',
+            Response::HTTP_FORBIDDEN
+        );
+    } catch (\Exception $e) {
+        \Log::error('Error updating event', ['error' => $e->getMessage()]);
+        return ApiResponse::error($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 
     /**
-     * Delete an event (owner only, no existing bookings)
+     * Delete an event
      *
-     * @param Event $event The event instance (injected via route model binding)
-     * @return JsonResponse JSON response (204 No Content or 403/422 errors)
+     * @param Event $event
+     * @return JsonResponse
      */
     public function destroy(Event $event): JsonResponse
     {
-        $userId = auth('sanctum')->id();
-        if (!$userId || $userId !== $event->user_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        try {
+            $this->authorize('delete', $event);
 
-        if ($event->bookings()->exists()) {
-            return response()->json(['message' => 'Cannot delete event with existing bookings'], 422);
-        }
+            $this->eventService->deleteEvent($event);
 
-        $this->eventService->deleteEvent($event);
-        return response()->json(null, 204);
+            return ApiResponse::success(
+                null,
+                'Event deleted successfully',
+                Response::HTTP_NO_CONTENT
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

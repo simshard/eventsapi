@@ -2,8 +2,8 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -21,15 +21,33 @@ class Handler extends ExceptionHandler
 
     /**
      * Register the exception handling callbacks for the application.
+     *
+     * @return void
      */
-    public function register(): void
+    public function register()
     {
-        $this->renderable(function (AuthorizationException $e, $request) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Unauthorized',
-                ], 403);
-            }
+        // EventNotFoundException handler
+        $this->renderable(function (EventNotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'status' => 'error',
+            ], Response::HTTP_NOT_FOUND);
+        });
+
+        // EventCapacityException handler
+        $this->renderable(function (EventCapacityException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'status' => 'error',
+            ], Response::HTTP_CONFLICT);
+        });
+
+        // DuplicateBookingException handler
+        $this->renderable(function (DuplicateBookingException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'status' => 'error',
+            ], Response::HTTP_CONFLICT);
         });
     }
 }

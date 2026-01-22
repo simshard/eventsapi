@@ -33,7 +33,7 @@ test('user cannot update another user\'s event', function () {
     $event = Event::factory()->create(['user_id' => $user1->id]);
 
     $response = $this
-        ->withHeader('Authorization', "Bearer $token")
+        ->actingAs($user2)
         ->putJson("/api/events/{$event->id}", ['title' => 'Hacked']);
 
     $response->assertStatus(403);
