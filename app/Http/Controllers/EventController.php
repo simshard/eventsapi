@@ -9,10 +9,21 @@ use App\Services\EventServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * EventController
+ *
+ * Handles HTTP requests for event management
+ */
 class EventController extends Controller
 {
     public function __construct(private EventServiceInterface $eventService) {}
 
+    /**
+     * Get all events or user's events with pagination and filtering
+     *
+     * @param Request $request HTTP request with query parameters
+     * @return JsonResponse JSON response with events and pagination metadata
+     */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->query('per_page', 15);
@@ -37,6 +48,12 @@ class EventController extends Controller
         ]);
     }
 
+    /**
+     * Create a new event
+     *
+     * @param StoreEventRequest $request Validated event creation request
+     * @return JsonResponse JSON response with created event (201 Created)
+     */
     public function store(StoreEventRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -45,11 +62,24 @@ class EventController extends Controller
         return response()->json(['data' => $event], 201);
     }
 
+    /**
+     * Retrieve a single event by ID
+     *
+     * @param Event $event The event instance (injected via route model binding)
+     * @return JsonResponse JSON response with event
+     */
     public function show(Event $event): JsonResponse
     {
         return response()->json(['data' => $event]);
     }
 
+    /**
+     * Update an existing event (owner only)
+     *
+     * @param UpdateEventRequest $request Validated event update request
+     * @param Event $event The event instance (injected via route model binding)
+     * @return JsonResponse JSON response with updated event or 403 Forbidden
+     */
     public function update(UpdateEventRequest $request, Event $event): JsonResponse
     {
         $userId = auth('sanctum')->id();
@@ -63,6 +93,12 @@ class EventController extends Controller
         return response()->json(['data' => $updatedEvent]);
     }
 
+    /**
+     * Delete an event (owner only, no existing bookings)
+     *
+     * @param Event $event The event instance (injected via route model binding)
+     * @return JsonResponse JSON response (204 No Content or 403/422 errors)
+     */
     public function destroy(Event $event): JsonResponse
     {
         $userId = auth('sanctum')->id();

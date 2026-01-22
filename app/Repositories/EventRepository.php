@@ -6,10 +6,19 @@ use App\Models\Event;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * EventRepository
+ *
+ * Concrete implementation of EventRepositoryInterface
+ * Handles all event data access operations
+ */
 class EventRepository implements EventRepositoryInterface
 {
     /**
      * Create a new event
+     *
+     * @param array $data Event attributes
+     * @return Event The created event
      */
     public function create(array $data): Event
     {
@@ -17,7 +26,11 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Get event by ID
+     * Retrieve an event by ID
+     *
+     * @param int $id The event ID
+     * @return Event The event
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function findById(int $id): Event
     {
@@ -25,7 +38,11 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Update an event
+     * Update an existing event
+     *
+     * @param int $id The event ID
+     * @param array $data Updated event attributes
+     * @return Event The updated event
      */
     public function update(int $id, array $data): Event
     {
@@ -36,6 +53,9 @@ class EventRepository implements EventRepositoryInterface
 
     /**
      * Delete an event
+     *
+     * @param int $id The event ID
+     * @return void
      */
     public function delete(int $id): void
     {
@@ -43,7 +63,11 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Get all events paginated
+     * Get all events with optional search filtering (paginated)
+     *
+     * @param int $perPage Number of events per page
+     * @param string|null $search Optional search query for title and description
+     * @return LengthAwarePaginator
      */
     public function paginate(int $perPage = 15, ?string $search = null): LengthAwarePaginator
     {
@@ -58,7 +82,11 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Get user's events paginated
+     * Get events owned by a specific user (paginated)
+     *
+     * @param int $userId The user ID
+     * @param int $perPage Number of events per page
+     * @return LengthAwarePaginator
      */
     public function getUserEvents(int $userId, int $perPage = 15): LengthAwarePaginator
     {
@@ -68,7 +96,9 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Get all events (no pagination)
+     * Get all events (unpaginated)
+     *
+     * @return Collection
      */
     public function all(): Collection
     {
@@ -76,7 +106,10 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Get events by user (no pagination)
+     * Get all events owned by a specific user (unpaginated)
+     *
+     * @param int $userId The user ID
+     * @return Collection
      */
     public function getByUser(int $userId): Collection
     {
@@ -86,7 +119,10 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Count events for a user
+     * Count events owned by a specific user
+     *
+     * @param int $userId The user ID
+     * @return int Total count of user's events
      */
     public function countByUser(int $userId): int
     {
@@ -94,7 +130,12 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Get events with filters and sorting
+     * Get events with advanced filtering, searching, and sorting
+     *
+     * @param string|null $sortBy Column to sort by (allowed: created_at, updated_at, id, title, start_time)
+     * @param string|null $search Optional search query for title and description
+     * @param int $perPage Number of events per page
+     * @return LengthAwarePaginator
      */
     public function getFiltered(
         ?string $sortBy = 'created_at',
@@ -115,7 +156,10 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Check if event exists
+     * Check if an event exists by ID
+     *
+     * @param int $id The event ID
+     * @return bool True if event exists, false otherwise
      */
     public function exists(int $id): bool
     {
@@ -123,7 +167,10 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Get upcoming events
+     * Get upcoming events (paginated)
+     *
+     * @param int $perPage Number of events per page
+     * @return LengthAwarePaginator
      */
     public function getUpcoming(int $perPage = 15): LengthAwarePaginator
     {
@@ -134,7 +181,10 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * Get past events
+     * Get past events (paginated)
+     *
+     * @param int $perPage Number of events per page
+     * @return LengthAwarePaginator
      */
     public function getPast(int $perPage = 15): LengthAwarePaginator
     {
@@ -144,5 +194,3 @@ class EventRepository implements EventRepositoryInterface
             ->paginate($perPage);
     }
 }
-
- 

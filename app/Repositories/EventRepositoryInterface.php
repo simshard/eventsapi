@@ -1,39 +1,88 @@
 <?php
 
-namespace App\Repositories;
-
-use Illuminate\Database\Eloquent\Collection;
+namespace App\Services;
+use App\Repositories\EventRepositoryInterface;
+use App\Models\Event;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-interface EventRepositoryInterface
+class EventService implements EventServiceInterface
 {
-    public function create(array $data);
+    private EventRepositoryInterface $eventRepository;
 
-    public function findById(int $id);
+    public function __construct(EventRepositoryInterface $eventRepository)
+    {
+        $this->eventRepository = $eventRepository;
+    }
 
-    public function update(int $id, array $data);
+    /**
+     * Retrieve paginated events with optional search filtering
+     *
+     * @param int $perPage Number of events per page
+     * @param string|null $search Optional search query
+     * @return LengthAwarePaginator
+     */
+    public function getAllEvents(int $perPage = 15, ?string $search = null): LengthAwarePaginator
+    {
+        return $this->eventRepository->paginate($perPage, $search);
+    }
 
-    public function delete(int $id): void;
+    /**
+     * Retrieve paginated events owned by a specific user
+     *
+     * @param int $userId The user ID
+     * @param int $perPage Number of events per page
+     * @return LengthAwarePaginator
+     */
+    public function getUserEvents(int $userId, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->eventRepository->getUserEvents($userId, $perPage);
+    }
 
-    public function paginate(int $perPage = 15, ?string $search = null): LengthAwarePaginator;
+    /**
+     * Create a new event for a user
+     *
+     * @param int $userId The user ID creating the event
+     * @param array $data Event attributes
+     * @return Event The created event
+     */
+    public function createEvent(int $userId, array $data): Event
+    {
+        $data['user_id'] = $userId;
+        return $this->eventRepository->create($data);
+    }
 
-    public function getUserEvents(int $userId, int $perPage = 15): LengthAwarePaginator;
+    /**
+     * Update an existing event
+     *
+     * @param Event $event The event to update
+     * @param array $data Updated event attributes
+     * @return Event The updated event
+     */
+    public function updateEvent(Event $event, array $data): Event
+    {
+        return $this->eventRepository->update($event->id, $data);
+    }
 
-    public function all(): Collection;
+    /**
+     * Delete an event
+     *
+     * @param Event $event The event to delete
+     * @return void
+     */
+    public function deleteEvent(Event $event): void
+    {
+        $this->eventRepository->delete($event->id);
+    }
 
-    public function getByUser(int $userId): Collection;
-
-    public function countByUser(int $userId): int;
-
-    public function getFiltered(
-        ?string $sortBy = 'created_at',
-        ?string $search = null,
-        int $perPage = 15
-    ): LengthAwarePaginator;
-
-    public function exists(int $id): bool;
-
-    public function getUpcoming(int $perPage = 15): LengthAwarePaginator;
-
-    public function getPast(int $perPage = 15): LengthAwarePaginator;
+    /**
+     * Retrieve an event by ID
+     *
+     * @param int $id The event ID
+     * @return Event The event
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function getEventById(int $id): Event
+    {
+        return $this->eventRepository->findById($id);
+    }
 }
