@@ -13,13 +13,10 @@ return new class extends Migration
     {
         Schema::create('attendees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-
-            $table->string('email');
-            $table->string('phone')->nullable();
-            $table->unique(['event_id', 'email']); // Prevent duplicate registrations
+            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
+            $table->unique(['event_id', 'user_id']); // Prevent duplicate registrations
         });
     }
 

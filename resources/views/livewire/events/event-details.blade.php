@@ -40,11 +40,11 @@
             <div class="space-y-3">
                 <div>
                     <span class="font-semibold text-gray-700">Owner:</span>
-                    <span class="ml-2">{{ $event->owner->name }}</span>
+                    <span class="ml-2">{{ $event->user->name }}</span>
                 </div>
                 <div>
                     <span class="font-semibold text-gray-700">Email:</span>
-                    <span class="ml-2">{{ $event->owner->email }}</span>
+                    <span class="ml-2">{{ $event->user->email }}</span>
                 </div>
             </div>
         </div>

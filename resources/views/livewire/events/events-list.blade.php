@@ -41,7 +41,7 @@
                             <td class="border border-gray-300 px-4 py-2">{{ $event->start_time->format('M d, Y H:i') }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $event->venue_capacity }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $event->attendees()->count() }}</td>
-                            <td class="border border-gray-300 px-4 py-2">{{ $event->owner->name }}</td>
+                            <td class="border border-gray-300 px-4 py-2">{{ $event->user->name }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                                 @if (auth()->id() === $event->user_id)
                                     <button
