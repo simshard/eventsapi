@@ -1,7 +1,9 @@
 ## SETUP ##
 > ### Download or Clone this Repository
+>
+> ` https://github.com/simshard/eventsapi `
 > 
-> #### at a terminal #### `run     composer run dev`
+> #### at a terminal ####    ` composer run dev `
 > 
 > set up database `php artisan migrate -seed`
 > 
