@@ -3,7 +3,7 @@
 >
 > ` https://github.com/simshard/eventsapi `
 > 
-> #### at a terminal ####    ` composer run dev `
+> #### at a terminal ####  ` composer run dev `
 > 
 > set up database `php artisan migrate -seed`
 > 
@@ -143,16 +143,15 @@ app/
 ######################################################################
 
   ## Event Feature Tests
-
-  - guests are redirected to the login page                             
-  - authenticated users can visit the dashboard                         
-  - auth users can see a list of their owned events and other events    
-  - authenticated user can update their own event                       
-  - user cannot update another user's event                             
-  - unauthenticated user cannot create an event                         
-  - event creation fails when data is missing required fields           
-  - event creation fails when start_time is after end_time              
-  - event is created with correct user_id                               
+  -  guests are redirected to the login page                             
+  -  authenticated users can visit the dashboard                         
+  -  auth users can see a list of their owned events and other events    
+  -  authenticated user can update their own event                       
+  -  user cannot update another user's event                             
+  -  unauthenticated user cannot create an event                         
+  -  event creation fails when data is missing required fields           
+  -  event creation fails when start_time is after end_time              
+  -  event is created with correct user_id                               
 
 ### Booking Feature Tests
 - User can book an available event
